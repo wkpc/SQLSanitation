@@ -167,7 +167,34 @@ public class Main extends Application
             {
                 return false;
             }
-        } catch (SQLException e) {
+        } catch (SQLException e)    //if the input is invalid and breaks the query, assume invalid login credentials
+        {
+            return false;
+        }
+    }
+
+    public static boolean sanitizedLogin(String username, String password, String table)
+    {
+        try
+        {
+            //send a query to database to check for matches with username and password
+            pstmt = conn.prepareStatement("SELECT * FROM " + table +
+                    " WHERE user = ? AND password = ?;");
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            ResultSet rs = pstmt.executeQuery();
+
+            //check results of query, if at least one match was found allow access
+            if (rs.next())
+            {
+                System.out.println("Access granted");
+                return true;
+            }else
+            {
+                return false;
+            }
+        } catch (SQLException e)     //if the input is invalid and breaks the query, assume invalid login credentials
+        {
             return false;
         }
     }
