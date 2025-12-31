@@ -1,17 +1,21 @@
 package ss.sqlsanitation;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import javafx.scene.control.TextField;
 
-public class Controller {
+public class Controller
+{
     @FXML
-    private Label welcomeText;
+    private TextField usernameField;
 
     @FXML
-    protected void onHelloButtonClick()
+    private TextField passwordField;
+
+    @FXML
+    void onLoginPressed(ActionEvent event)
     {
-        welcomeText.setText("Welcome to JavaFX Application!");
+        String inputUsername = usernameField.getText();
+        String inputPassword = passwordField.getText();
     }
 }

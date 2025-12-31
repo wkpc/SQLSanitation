@@ -63,6 +63,7 @@ public class Main extends Application
             //if they are, add in the default passwords
             if (rs.getInt(1) == 0)
             {
+                //add the default password to the hashed and encrypted table
                 pstmt = conn.prepareStatement("INSERT INTO hashed(user, hash) VALUES (?, ?)");
                 pstmt.setString(1, "admin");
                 pstmt.setString(2, hash("password"));
