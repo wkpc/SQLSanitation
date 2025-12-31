@@ -24,7 +24,7 @@ public class Main extends Application
     {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("sqlsanitation.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        stage.setTitle("Hello!");
+        stage.setTitle("SQLSanitation");
         stage.setScene(scene);
         stage.show();
     }
@@ -50,10 +50,10 @@ public class Main extends Application
             stmt = conn.createStatement();
             stmt.execute("CREATE TABLE IF NOT EXISTS hashed ("
                     + "user TEXT PRIMARY KEY,"
-                    + "hash BINARY NOT NULL);");
+                    + "password BINARY NOT NULL);");
             stmt.execute("CREATE TABLE IF NOT EXISTS encrypted ("
                     + "user TEXT PRIMARY KEY,"
-                    + "ciphertext TEXT NOT NULL);");
+                    + "password TEXT NOT NULL);");
 
             //check if the tables are empty (i.e. freshly created)
             rs = stmt.executeQuery(  "SELECT COUNT(*) FROM hashed;");
@@ -64,13 +64,13 @@ public class Main extends Application
             if (rs.getInt(1) == 0)
             {
                 //add the default password to the hashed and encrypted table
-                pstmt = conn.prepareStatement("INSERT INTO hashed(user, hash) VALUES (?, ?)");
+                pstmt = conn.prepareStatement("INSERT INTO hashed(user, password) VALUES (?, ?)");
                 pstmt.setString(1, "admin");
                 pstmt.setString(2, hash("password"));
                 System.out.println(hash("2"));
                 pstmt.executeUpdate();
 
-                pstmt = conn.prepareStatement("INSERT INTO encrypted(user, ciphertext) VALUES (?, ?)");
+                pstmt = conn.prepareStatement("INSERT INTO encrypted(user, password) VALUES (?, ?)");
                 pstmt.setString(1, "admin");
                 pstmt.setString(2, "two");
                 pstmt.executeUpdate();
@@ -80,7 +80,7 @@ public class Main extends Application
 
             while (rs.next())
             {
-                System.out.println(rs.getString("user") + ", " + rs.getString("hash"));
+                System.out.println(rs.getString("user") + ", " + rs.getString("password"));
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -108,7 +108,7 @@ public class Main extends Application
      * @param plaintext The string to be hashed
      * @return The hashed version of the string, in binary. Returns empty string instead if SHA-256 couldn't be found.
      */
-    private static String hash(String plaintext)
+    public static String hash(String plaintext)
     {
         try
         {
@@ -134,6 +134,41 @@ public class Main extends Application
         } catch (NoSuchAlgorithmException e) //if cannot find SHA-256 algorithm, return blank string
         {
             return "";
+        }
+    }
+
+    /**
+     * Given a set of login credentials, checks to see if login should be allowed. Uses Statements to query the database,
+     * making it possible to sneak SQL commands into the inputs. Only possible for the SQL commands to be snuck into the
+     * username field, since password input is first hashed before being passed into the query.
+     * @param username The username credentials inputted by the user
+     * @param password The password credentials inputted by the user
+     * @param table The table to be checked for logins, either "hashed" or "encrypted"
+     * @return true if a match is found, false if not
+     */
+    public static boolean unsanitizedLogin(String username, String password, String table)
+    {
+        try
+        {
+            //send a query to database to check for matches with username and password
+            stmt = conn.createStatement();
+            String command = "SELECT * FROM " + table +
+                    " WHERE user = '" + username + "' AND password = '" +
+                    password + "';";
+
+            ResultSet rs = stmt.executeQuery(command);
+
+            //check results of query, if at least one match was found allow access
+            if (rs.next())
+            {
+                System.out.println("Access granted");
+                return true;
+            }else
+            {
+                return false;
+            }
+        } catch (SQLException e) {
+            return false;
         }
     }
 }
