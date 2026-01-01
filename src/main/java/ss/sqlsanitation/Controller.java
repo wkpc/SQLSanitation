@@ -28,6 +28,7 @@ public class Controller
         //populate the sanitation method choice box, and default to unsanitized
         sanitationMethodChoice.getItems().add("Unsanitized");
         sanitationMethodChoice.getItems().add("Sanitized");
+        sanitationMethodChoice.getItems().add("Custom");
         sanitationMethodChoice.setValue("Unsanitized");
     }
 
@@ -41,7 +42,16 @@ public class Controller
         //choose the matching sanitation method and check for login
         if (sanitationMethodChoice.getValue().equals("Unsanitized"))
         {
-            if (Main.unsanitizedLogin(inputUsername, Main.hash(inputPassword), "hashed"))
+            if (Database.unsanitizedLogin(inputUsername, Database.hash(inputPassword), "hashed"))
+            {
+                statusLabel.setText("Access granted");
+            }else
+            {
+                statusLabel.setText("Access denied");
+            }
+        }else if (sanitationMethodChoice.getValue().equals("sanitized"))
+        {
+            if (Database.sanitizedLogin(inputUsername, Database.hash(inputPassword), "hashed"))
             {
                 statusLabel.setText("Access granted");
             }else
@@ -50,7 +60,7 @@ public class Controller
             }
         }else
         {
-            if (Main.sanitizedLogin(inputUsername, Main.hash(inputPassword), "hashed"))
+            if (Database.customLogin(inputUsername, Database.hash(inputPassword), "hashed"))
             {
                 statusLabel.setText("Access granted");
             }else
