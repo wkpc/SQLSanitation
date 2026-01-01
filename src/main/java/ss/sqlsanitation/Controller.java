@@ -49,7 +49,7 @@ public class Controller
             {
                 statusLabel.setText("Access denied");
             }
-        }else if (sanitationMethodChoice.getValue().equals("sanitized"))
+        }else if (sanitationMethodChoice.getValue().equals("Sanitized"))
         {
             if (Database.sanitizedLogin(inputUsername, Database.hash(inputPassword), "hashed"))
             {

@@ -197,8 +197,9 @@ public final class Database
      * addition of brackets around each of the conditions. This makes it so it is impossible to circumvent one of the
      * conditions (i.e. both conditions must be satisfied), so SQL commands would have to be injected into both fields
      * to satisfy the conditions. This shouldn't be possible, as the password field is hashed before being passed to the
-     * database, thus destroying any possible SQL commands. It would only be possible for SQL commands to be snuck into the
-     * username field, so this should be relatively safe from SQL injections.
+     * database, thus destroying any possible SQL commands. It would only be possible for SQL commands to be snuck into
+     * the username field, so this should be relatively safe from SQL injections. In addition, the escaper() function is
+     * called on the input before being passed to as a query, to sanitize the input.
      * @param username The username credentials inputted by the user
      * @param password The password credentials inputted by the user
      * @param table The table to be checked for logins, either "hashed" or "encrypted"
@@ -208,6 +209,10 @@ public final class Database
     {
         try
         {
+            //enclose input in "" so SQL treats it as literals, and escape special characters
+            username = escaper(username);
+            //password doesn't need to be sanitized, already hashed
+
             //send a query to database to check for matches with username and password
             String command = "SELECT * FROM " + table +
                     " WHERE (user = '" + username + "') AND (password = '" +
@@ -228,5 +233,22 @@ public final class Database
         {
             return false;
         }
+    }
+
+    /**
+     * Special characters ', ", and \ are escaped to ensure input is treated a literal, and prevent string escaping.
+     * @param input The string to be sanitized
+     * @return The sanitized string, enclosed in ""
+     */
+    private static String escaper(String input)
+    {
+        //escape possibly problematic special characters
+        input = input.replace("\\", "\\\\");
+        input = input.replace("'", "''");
+        input = input.replace("\"", "\"\"");
+
+        //enclose entire string in "", so SQL treats it like a literal
+        System.out.println("\"" + input + "\"");
+        return input;
     }
 }
