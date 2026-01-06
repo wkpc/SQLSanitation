@@ -12,8 +12,9 @@ public final class Database
 
     /**
      * sets up the password databases with 2 tables, 1 for hashed passwords 1 for encrypted passwords
+     * @return true if initialization suceeds, false if an error is encountered
      */
-    public static void databaseInitial()
+    public static boolean databaseInitial()
     {
         try
         {
@@ -43,7 +44,6 @@ public final class Database
                 PreparedStatement pstmt = conn.prepareStatement("INSERT INTO hashed(user, password) VALUES (?, ?)");
                 pstmt.setString(1, "admin");
                 pstmt.setString(2, hash("password"));
-                System.out.println(hash("2"));
                 pstmt.executeUpdate();
 
                 pstmt = conn.prepareStatement("INSERT INTO encrypted(user, password) VALUES (?, ?)");
@@ -57,14 +57,20 @@ public final class Database
                 pstmt.executeUpdate();
             }
 
+            /// /////////////////////////////////// DEBUG ///////////////////////////////////
             rs = stmt.executeQuery(  "SELECT * FROM hashed");
 
             while (rs.next())
             {
                 System.out.println(rs.getString("user") + ", " + rs.getString("password"));
             }
-        } catch (SQLException e) {
+
+            //return true if initialization suceeded
+            return true;
+        } catch (Exception e)
+        {
             System.out.println(e.getMessage());
+            return false;
         }
     }
 
@@ -101,20 +107,18 @@ public final class Database
             byte[] hash = digest.digest(plaintext.getBytes(StandardCharsets.UTF_8));
 
             //now must convert hash into string for storage
-            String hashString = "";
+            //use StringBuilder instead of string for repeated concatenation
+            StringBuilder hashString = new StringBuilder();
 
             //go through each byte in the hash...
             for (byte b: hash)
             {
-                //...and through each bit in each hash...
-                for (int i = 0; i < 8; i++)
-                {
-                    //collect each bit
-                    hashString = hashString + ((b >> (7 - i)) & 1);
-                }
+                //and convert it into a hexadecimal string
+                hashString.append(String.format("%02x", b));
             }
 
-            return hashString;
+            System.out.println("Hash: " + hashString);
+            return hashString.toString();
         } catch (NoSuchAlgorithmException e) //if cannot find SHA-256 algorithm, return blank string
         {
             return "";
@@ -209,7 +213,6 @@ public final class Database
     {
         try
         {
-            //enclose input in "" so SQL treats it as literals, and escape special characters
             username = escaper(username);
             //password doesn't need to be sanitized, already hashed
 

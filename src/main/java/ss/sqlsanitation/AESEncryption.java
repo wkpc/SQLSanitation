@@ -42,24 +42,20 @@ public final class AESEncryption
             byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
 
             //now must convert in back into a string
-            String encryptedString = "";
+            StringBuilder encryptedString = new StringBuilder();
 
-            //go through each byte in the hash...
+            //go through each byte in the ciphertext...
             for (byte b: encryptedBytes)
             {
-                //...and through each bit in each hash...
-                for (int i = 0; i < 8; i++)
-                {
-                    //collect each bit
-                    encryptedString = encryptedString + ((b >> (7 - i)) & 1);
-                }
+                encryptedString.append(String.format("%02x", b));
             }
 
             //return the encrypted plain text in string form
-            return encryptedString;
-        }catch (Exception e)
+            return encryptedString.toString();
+        }catch (Exception e) //if encryption fails, return blank string
         {
-            return "Something wrong with encryption.";
+            return "";
         }
     }
+
 }

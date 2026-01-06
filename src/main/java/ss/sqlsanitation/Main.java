@@ -20,8 +20,14 @@ public class Main extends Application
 
     public static void main(String[] args)
     {
-        System.out.println("\\n");
-        Database.databaseInitial();
-        launch();
+        //make sure database was initialized properly before launching
+        if (Database.databaseInitial())
+        {
+            System.out.println(AESEncryption.encryptAES("hello"));
+            launch();
+        }else
+        {
+            System.out.println("Something went wrong with the database initialization");
+        }
     }
 }
