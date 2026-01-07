@@ -4,42 +4,47 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.HexFormat;
 
 public final class AESEncryption
 {
-    private static Cipher cipher;
+    private static Cipher cipherE;
+    private static Cipher cipherD;
 
-    //static variable cipher initialization
+    //static variable cipherE initialization
     static
     {
         try
         {
-            //set up the cipher for AES
+            //set up the ciphers for AES
             KeyGenerator keyGen = KeyGenerator.getInstance("AES");
             keyGen.init(128);
             SecretKey key = keyGen.generateKey();
 
-            cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
+            //use 2 ciphers, 1 for encrypting 1 for decrypting
+            cipherE = Cipher.getInstance("AES");
+            cipherE.init(Cipher.ENCRYPT_MODE, key);
+            cipherD = Cipher.getInstance("AES");
+            cipherD.init(Cipher.DECRYPT_MODE, key);
         }catch (Exception e)
         {
             System.out.println("Something wrong with initial");
         }
-        System.out.println("static initial");
+        System.out.println("static initialized");
     }
 
     /**
-     * Encrypts an input string with the 128-bit AES cipher, and returns a string of binary digits representing the
+     * Encrypts an input string with the 128-bit AES cipherE, and returns a string of binary digits representing the
      * ciphertext.
      * @param plainText The string to be encrypted
-     * @return The cipher text, in a binary form string
+     * @return The cipherE text, in a binary form string
      */
     public static String encryptAES(String plainText)
     {
         try
         {
-            //encrypt plain text with AES cipher
-            byte[] encryptedBytes = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+            //encrypt plain text with AES cipherE
+            byte[] encryptedBytes = cipherE.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
 
             //now must convert in back into a string
             StringBuilder encryptedString = new StringBuilder();
@@ -58,4 +63,22 @@ public final class AESEncryption
         }
     }
 
+
+    public static String decryptAES(String cipherText)
+    {
+        try
+        {
+            //first convert it back into byte array and decrypt
+            byte[] encryptedBytes = HexFormat.of().parseHex(cipherText);
+            byte[] decryptedBytes = cipherD.doFinal(encryptedBytes);
+
+            //then turn byte array back into a string
+            String plainText = new String(decryptedBytes, StandardCharsets.UTF_8);
+
+            return plainText;
+        } catch (Exception e) //if decryption fails, return blank string
+        {
+            return "";
+        }
+    }
 }
