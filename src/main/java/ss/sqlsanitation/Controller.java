@@ -6,6 +6,7 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 
 public class Controller
 {
@@ -21,7 +22,14 @@ public class Controller
     @FXML
     private ChoiceBox<String> sanitationMethodChoice;
 
+    @FXML
+    private TextArea databaseContents;
 
+    private boolean accessGranted = false;
+
+    /**
+     * initial GUI set up
+     */
     @FXML
     void initialize()
     {
@@ -30,8 +38,17 @@ public class Controller
         sanitationMethodChoice.getItems().add("Sanitized");
         sanitationMethodChoice.getItems().add("Custom");
         sanitationMethodChoice.setValue("Unsanitized");
+
+        //load the encrypted database contents
+        System.out.println("database contents: " + Database.printDatabase(false));
+        databaseContents.setText(Database.printDatabase(false));
     }
 
+    /**
+     * Checks the inputted login credentials for a match with the password database, to see if access should be granted.
+     * The method in which the SQL query is formed is determined by the login method chosen by the user.
+     * @param event not used
+     */
     @FXML
     void onLoginPressed(ActionEvent event)
     {
@@ -40,35 +57,29 @@ public class Controller
         String inputPassword = passwordField.getText();
 
         //choose the matching sanitation method and check for login
-        if (sanitationMethodChoice.getValue().equals("Unsanitized"))
+        if (sanitationMethodChoice.getValue().equals("Unsanitized") &&
+                Database.unsanitizedLogin(inputUsername, Database.hash(inputPassword), "hashed")
+        || sanitationMethodChoice.getValue().equals("Sanitized") &&
+                Database.sanitizedLogin(inputUsername, Database.hash(inputPassword), "hashed")
+        || sanitationMethodChoice.getValue().equals("Custom") &&
+                Database.customLogin(inputUsername, Database.hash(inputPassword), "hashed"))
         {
-            if (Database.unsanitizedLogin(inputUsername, Database.hash(inputPassword), "hashed"))
-            {
-                statusLabel.setText("Access granted");
-            }else
-            {
-                statusLabel.setText("Access denied");
-            }
-        }else if (sanitationMethodChoice.getValue().equals("Sanitized"))
-        {
-            if (Database.sanitizedLogin(inputUsername, Database.hash(inputPassword), "hashed"))
-            {
-                statusLabel.setText("Access granted");
-            }else
-            {
-                statusLabel.setText("Access denied");
-            }
+            statusLabel.setText("Access granted");
+            accessGranted = true;
         }else
         {
-            if (Database.customLogin(inputUsername, Database.hash(inputPassword), "hashed"))
-            {
-                statusLabel.setText("Access granted");
-            }else
-            {
-                statusLabel.setText("Access denied");
-            }
+            statusLabel.setText("Access denied");
         }
+    }
 
-
+    @FXML
+    void onDecryptDataPressed(ActionEvent event)
+    {
+        //check if the user has access, and decrypt the database if they do
+        if (accessGranted)
+        {
+            System.out.println("database contents: " + Database.printDatabase(true));
+            databaseContents.setText(Database.printDatabase(true));
+        }
     }
 }

@@ -59,11 +59,17 @@ public final class AESEncryption
             return encryptedString.toString();
         }catch (Exception e) //if encryption fails, return blank string
         {
+            System.out.println("E: " + e);
             return "";
         }
     }
 
 
+    /**
+     * Decrypts an input string with 128-bit AES cipherD, and returns the original plain text.
+     * @param cipherText The string to be decrypted
+     * @return The original plain text in string format
+     */
     public static String decryptAES(String cipherText)
     {
         try
@@ -78,6 +84,7 @@ public final class AESEncryption
             return plainText;
         } catch (Exception e) //if decryption fails, return blank string
         {
+            System.out.println("E: " + e);
             return "";
         }
     }

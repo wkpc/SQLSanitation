@@ -26,11 +26,9 @@ public final class Database
                     + "user TEXT PRIMARY KEY,"
                     + "password BINARY NOT NULL);");
             stmt.execute("CREATE TABLE IF NOT EXISTS encrypted ("
-                    + "user TEXT PRIMARY KEY,"
-                    + "password TEXT NOT NULL);");
-            stmt.execute("CREATE TABLE IF NOT EXISTS test ("
-                    + "user TEXT PRIMARY KEY,"
-                    + "password TEXT NOT NULL);");
+                    + "key INT PRIMARY KEY,"
+                    + "data TEXT NOT NULL);");
+
 
             //check if the tables are empty (i.e. freshly created)
             ResultSet rs = stmt.executeQuery(  "SELECT COUNT(*) FROM hashed;");
@@ -40,29 +38,27 @@ public final class Database
             //if they are, add in the default passwords
             if (rs.getInt(1) == 0)
             {
-                //add the default password to the hashed and encrypted table
+                //generate the default data values
+                String hashedPassword = hash("password");
+                String encryptedData = AESEncryption.encryptAES("hello");
+
+                //if something went wrong with generation, prevent program from launching
+                if (hashedPassword.equals("") || encryptedData.equals(""))
+                {
+                    return false;
+                }
+
+                //add the default entries to the hashed and encrypted table
                 PreparedStatement pstmt = conn.prepareStatement("INSERT INTO hashed(user, password) VALUES (?, ?)");
                 pstmt.setString(1, "admin");
-                pstmt.setString(2, hash("password"));
+                pstmt.setString(2, hashedPassword);
                 pstmt.executeUpdate();
 
-                pstmt = conn.prepareStatement("INSERT INTO encrypted(user, password) VALUES (?, ?)");
-                pstmt.setString(1, "admin");
-                pstmt.setString(2, "two");
+                pstmt = conn.prepareStatement("INSERT INTO encrypted(key, data) VALUES (?, ?)");
+                pstmt.setString(1, "1");
+                pstmt.setString(2, encryptedData);
                 pstmt.executeUpdate();
 
-                pstmt = conn.prepareStatement("INSERT INTO test(user, password) VALUES (?, ?)");
-                pstmt.setString(1, "admin");
-                pstmt.setString(2, "two");
-                pstmt.executeUpdate();
-            }
-
-            /// /////////////////////////////////// DEBUG ///////////////////////////////////
-            rs = stmt.executeQuery(  "SELECT * FROM hashed");
-
-            while (rs.next())
-            {
-                System.out.println(rs.getString("user") + ", " + rs.getString("password"));
             }
 
             //return true if initialization suceeded
@@ -139,7 +135,6 @@ public final class Database
         try
         {
             //send a query to database to check for matches with username and password
-            stmt = conn.createStatement();
             String command = "SELECT * FROM " + table +
                     " WHERE user = '" + username + "' AND password = '" +
                     password + "';";
@@ -253,5 +248,46 @@ public final class Database
         //enclose entire string in "", so SQL treats it like a literal
         System.out.println("\"" + input + "\"");
         return input;
+    }
+
+    /**
+     * Returns the contents of the encrypted table in database.db as a string. Contents may or may not be decrypted
+     * first, depending on the value of the parameter.
+     * @param decrypted Whether the contents should be decrypted or not. True if they should, false if not
+     * @return Contents of the encrypted table in database.db
+     */
+    public static String printDatabase(boolean decrypted)
+    {
+        try
+        {
+            StringBuilder result = new StringBuilder();
+
+            //collect the contents of the database
+            ResultSet rs = stmt.executeQuery("SELECT * FROM encrypted;");
+
+            int count = 1;
+
+            //add the contents of each entry to the results
+            while (rs.next())
+            {
+                result.append(count);
+                result.append(": ");
+
+                //decrypt the data if necessary
+                if (decrypted == true)
+                {
+                    result.append(AESEncryption.decryptAES(rs.getString("data")));
+                }else
+                {
+                    result.append(rs.getString("data"));
+                }
+                result.append("\n");
+            }
+
+            return result.toString();
+        } catch (SQLException e)
+        {
+            return "";
+        }
     }
 }
