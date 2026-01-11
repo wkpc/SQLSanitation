@@ -1,6 +1,5 @@
 # Information
 By Weikai Chen \
-Email: weikai.c@ucalgary.ca \
 Github: https://github.com/wkpc/SQLSanitation
 
 This program tests the implementation of SQL, input sanitation, password hashing, and encryption in

@@ -35,7 +35,7 @@ public final class Database
 
             rs.next();
 
-            //if they are, add in the default passwords
+            //if they are, add in the default passwords and encrypted data
             if (rs.getInt(1) == 0)
             {
                 //generate the default data values
@@ -58,10 +58,8 @@ public final class Database
                 pstmt.setString(1, "1");
                 pstmt.setString(2, encryptedData);
                 pstmt.executeUpdate();
-
             }
-
-            //return true if initialization suceeded
+            //return true if initialization succeeded
             return true;
         } catch (Exception e)
         {
@@ -244,6 +242,43 @@ public final class Database
         return input;
     }
 
+    public static boolean addEntry(String key, String newEntry)
+    {
+        try
+        {
+            //add the new entry data to the database
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO encrypted(key, data) VALUES (?, ?);");
+            pstmt.setString(1, key);
+            pstmt.setString(2, AESEncryption.encryptAES(newEntry));
+            pstmt.executeUpdate();
+
+            //if this code is reached, no errors were encountered and entry successfully added
+            return true;
+        } catch (SQLException e)     //if the input is invalid and breaks the query, assume invalid login credentials
+        {
+            System.out.println("E: " + e);
+            return false;
+        }
+    }
+
+    public static boolean removeEntry(String key)
+    {
+        try
+        {
+            //add the new entry data to the database
+            PreparedStatement pstmt = conn.prepareStatement("DELETE FROM encrypted WHERE key = ?;");
+            pstmt.setString(1, key);
+            pstmt.executeUpdate();
+
+            //if this code is reached, no errors were encountered and entry successfully removed
+            return true;
+        } catch (SQLException e)     //if the input is invalid and breaks the query, assume invalid login credentials
+        {
+            System.out.println("E: " + e);
+            return false;
+        }
+    }
+
     /**
      * Returns the contents of the encrypted table in database.db as a string. Contents may or may not be decrypted
      * first, depending on the value of the parameter.
@@ -259,12 +294,10 @@ public final class Database
             //collect the contents of the database
             ResultSet rs = stmt.executeQuery("SELECT * FROM encrypted;");
 
-            int count = 1;
-
             //add the contents of each entry to the results
             while (rs.next())
             {
-                result.append(count);
+                result.append(rs.getString("key"));
                 result.append(": ");
 
                 //decrypt the data if necessary
@@ -275,6 +308,8 @@ public final class Database
                 {
                     result.append(rs.getString("data"));
                 }
+
+                //move to the next line, and update the count
                 result.append("\n");
             }
 

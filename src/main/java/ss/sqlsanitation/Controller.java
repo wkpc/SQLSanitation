@@ -25,6 +25,15 @@ public class Controller
     @FXML
     private TextArea databaseContents;
 
+    @FXML
+    private TextField addEntryKeyField;
+
+    @FXML
+    private TextField addEntryDataField;
+
+    @FXML
+    private TextField removeEntryKeyField;
+
     private boolean accessGranted = false;
 
     /**
@@ -85,6 +94,66 @@ public class Controller
         }else
         {
             statusLabel.setText("Permission Denied");
+        }
+    }
+
+    /**
+     * If the user has signed in, adds a new row to the encrypted table in database.db. Uses the key and data values
+     * provided in the associated text fields. If the user hasn't signed in, or either of the text fields are left blank,
+     * do nothing.
+     * @param event Not used
+     */
+    @FXML
+    void onAddData(ActionEvent event)
+    {
+        //check if the addDataField has been filled out and user has login permission
+        if (accessGranted && !addEntryKeyField.getText().isBlank() && !addEntryDataField.getText().isBlank())
+        {
+            //if it has, add the entry and update the database display
+            boolean success = Database.addEntry(addEntryKeyField.getText(), addEntryDataField.getText());
+            databaseContents.setText(Database.printDatabase(false));
+
+            //notify user of action success
+            if (success)
+            {
+                statusLabel.setText("Entry added");
+            }else
+            {
+                statusLabel.setText("Entry could not be added.");
+            }
+        }else
+        {
+            statusLabel.setText("Entry could not be added.");
+        }
+    }
+
+    /**
+     * If the user has signed in, removes a row from the encrypted table in database.db. Uses the key value provided in
+     * the associated text fields, and delete all entries with matching key values (Keys are unique, so at most 1 row is
+     * deleted). If the user hasn't signed in, or the text fields is left blank, do nothing.
+     * @param event Not used
+     */
+    @FXML
+    void OnRemoveData(ActionEvent event)
+    {
+        //check if the addDataField has been filled out and user has login permission
+        if (accessGranted && !removeEntryKeyField.getText().isBlank())
+        {
+            //if it has, add the entry and update the database display
+            boolean success = Database.removeEntry(removeEntryKeyField.getText());
+            databaseContents.setText(Database.printDatabase(false));
+
+            //notify user of action success
+            if (success)
+            {
+                statusLabel.setText("Entry removed");
+            }else
+            {
+                statusLabel.setText("Entry could not be removed.");
+            }
+        }else
+        {
+            statusLabel.setText("Entry could not be removed.");
         }
     }
 }
