@@ -30,7 +30,7 @@
                   <PasswordField fx:id="passwordField" />
                </children>
             </HBox>
-            <Label fx:id="statusLabel" prefHeight="17.0" prefWidth="165.0" textAlignment="CENTER" />
+            <Label fx:id="statusLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="165.0" textAlignment="CENTER" />
             <Button mnemonicParsing="false" onAction="#onLoginPressed" text="Login" />
             <ChoiceBox fx:id="sanitationMethodChoice" prefWidth="150.0" />
          </children>

@@ -3,7 +3,12 @@ package ss.sqlsanitation;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.util.HexFormat;
 
 public final class AESEncryption
@@ -11,21 +16,55 @@ public final class AESEncryption
     private static Cipher cipherE;
     private static Cipher cipherD;
 
-    //static variable cipherE initialization
+    //static variable cipherE initialization, along with key retrieval/creation
     static
     {
         try
         {
-            //set up the ciphers for AES
-            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
-            keyGen.init(128);
-            SecretKey key = keyGen.generateKey();
+            SecretKey key = null;
+            char[] pwd = "password".toCharArray();  //password for key store and key store entries
 
-            //use 2 ciphers, 1 for encrypting 1 for decrypting
+            //check if a key store (i.e. previously generated key) already exists
+            File file = new File("./passwords.jks");
+            KeyStore ks = KeyStore.getInstance("pkcs12");
+
+            //if it doesn't make a new one
+            if (!file.exists())
+            {
+                //create a new key for AES encryption
+                KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+                keyGen.init(128);
+                key = keyGen.generateKey();
+
+                //create the key store
+                ks.load(null, pwd);
+
+                //store the newly generated key in the key store
+                KeyStore.SecretKeyEntry secKey = new KeyStore.SecretKeyEntry(key);
+                KeyStore.ProtectionParameter proPara = new KeyStore.PasswordProtection(pwd);
+                ks.setEntry("key", secKey, proPara);
+
+                //create the key store file
+                FileOutputStream fos = new FileOutputStream("./passwords.jks");
+                ks.store(fos, pwd);
+            }else   //if a key store already exists
+            {
+                //load the key store
+                FileInputStream fis = new FileInputStream("./passwords.jks");
+                ks.load(fis, pwd);
+
+                //load the key from the key store
+                key = (SecretKey) ks.getKey("key", pwd);
+            }
+
+            //initialize 2 ciphers, 1 for encrypting 1 for decrypting
             cipherE = Cipher.getInstance("AES");
             cipherE.init(Cipher.ENCRYPT_MODE, key);
             cipherD = Cipher.getInstance("AES");
             cipherD.init(Cipher.DECRYPT_MODE, key);
+        }catch (IOException e) //if the key store type doesn't match or password is incorrect
+        {
+            System.out.println("mismatch error");
         }catch (Exception e)
         {
             System.out.println("Something wrong with initial");

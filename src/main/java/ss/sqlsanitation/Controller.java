@@ -72,6 +72,10 @@ public class Controller
         }
     }
 
+    /**
+     * Check if user has successfully signed in, and if so, decrypts the contents of the database.
+     * @param event Not used
+     */
     @FXML
     void onDecryptDataPressed(ActionEvent event)
     {
@@ -80,6 +84,9 @@ public class Controller
         {
             System.out.println("database contents: " + Database.printDatabase(true));
             databaseContents.setText(Database.printDatabase(true));
+        }else
+        {
+            statusLabel.setText("Permission Denied");
         }
     }
 }
