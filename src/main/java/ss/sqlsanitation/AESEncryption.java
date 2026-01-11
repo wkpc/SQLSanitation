@@ -17,7 +17,7 @@ public final class AESEncryption
     private static Cipher cipherD;
 
     //static variable cipherE initialization, along with key retrieval/creation
-    static
+    public static boolean AESEncryptionInitialization()
     {
         try
         {
@@ -62,14 +62,18 @@ public final class AESEncryption
             cipherE.init(Cipher.ENCRYPT_MODE, key);
             cipherD = Cipher.getInstance("AES");
             cipherD.init(Cipher.DECRYPT_MODE, key);
+
+            //if initialization was completed without problems
+            return true;
         }catch (IOException e) //if the key store type doesn't match or password is incorrect
         {
             System.out.println("mismatch error");
+            return false;
         }catch (Exception e)
         {
             System.out.println("Something wrong with initial");
+            return false;
         }
-        System.out.println("static initialized");
     }
 
     /**

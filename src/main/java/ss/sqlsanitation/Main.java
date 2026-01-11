@@ -22,18 +22,13 @@ public class Main extends Application
 
     public static void main(String[] args)
     {
-        //make sure database was initialized properly before launching
-        if (Database.databaseInitial())
+        //make sure database and ciphers were initialized properly before launching
+        if (AESEncryption.AESEncryptionInitialization() && Database.databaseInitial())
         {
-            System.out.println(AESEncryption.encryptAES("hello"));
             launch();
-        }else
+        }else   //don't launch if something went wrong with initialization
         {
             System.out.println("Something went wrong with the database initialization");
         }
-
-        String encHello = AESEncryption.encryptAES("hello");
-        System.out.println("Encrypted hello: " + encHello);
-        System.out.println("encryption test: " + AESEncryption.decryptAES(encHello));
     }
 }

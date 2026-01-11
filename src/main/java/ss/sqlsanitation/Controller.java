@@ -40,7 +40,6 @@ public class Controller
         sanitationMethodChoice.setValue("Unsanitized");
 
         //load the encrypted database contents
-        System.out.println("database contents: " + Database.printDatabase(false));
         databaseContents.setText(Database.printDatabase(false));
     }
 
@@ -82,7 +81,6 @@ public class Controller
         //check if the user has access, and decrypt the database if they do
         if (accessGranted)
         {
-            System.out.println("database contents: " + Database.printDatabase(true));
             databaseContents.setText(Database.printDatabase(true));
         }else
         {

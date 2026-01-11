@@ -80,7 +80,6 @@ public final class Database
         try
         {
             conn = DriverManager.getConnection(url);
-            System.out.println("Connection to SQLite has been established.");
 
             //also set up stmt for later use
             stmt = conn.createStatement();
@@ -113,7 +112,6 @@ public final class Database
                 hashString.append(String.format("%02x", b));
             }
 
-            System.out.println("Hash: " + hashString);
             return hashString.toString();
         } catch (NoSuchAlgorithmException e) //if cannot find SHA-256 algorithm, return blank string
         {
@@ -144,7 +142,6 @@ public final class Database
             //check results of query, if at least one match was found allow access
             if (rs.next())
             {
-                System.out.println("Access granted");
                 return true;
             }else
             {
@@ -178,7 +175,6 @@ public final class Database
             //check results of query, if at least one match was found allow access
             if (rs.next())
             {
-                System.out.println("Access granted");
                 return true;
             }else
             {
@@ -221,7 +217,6 @@ public final class Database
             //check results of query, if at least one match was found allow access
             if (rs.next())
             {
-                System.out.println("Access granted");
                 return true;
             }else
             {
@@ -246,7 +241,6 @@ public final class Database
         input = input.replace("\"", "\"\"");
 
         //enclose entire string in "", so SQL treats it like a literal
-        System.out.println("\"" + input + "\"");
         return input;
     }
 
