@@ -24,7 +24,7 @@ public final class Database
             //create the 2 tables for passwords (if they don't already exist), 1 for encrypted 1 for hashed
             stmt.execute("CREATE TABLE IF NOT EXISTS hashed ("
                     + "user TEXT PRIMARY KEY,"
-                    + "password BINARY NOT NULL);");
+                    + "password TEXT NOT NULL);");
             stmt.execute("CREATE TABLE IF NOT EXISTS encrypted ("
                     + "key INT PRIMARY KEY,"
                     + "data TEXT NOT NULL);");
@@ -89,7 +89,7 @@ public final class Database
     /**
      * Given a plaintext string, hashes it with SHA-256 to get a binary string
      * @param plaintext The string to be hashed
-     * @return The hashed version of the string, in binary. Returns empty string instead if SHA-256 couldn't be found.
+     * @return The hashed version of the string, in hexidecimal. Returns empty string instead if SHA-256 couldn't be found.
      */
     public static String hash(String plaintext)
     {

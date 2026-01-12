@@ -3,7 +3,7 @@ By Weikai Chen \
 Github: https://github.com/wkpc/SQLSanitation
 
 This program tests the implementation of SQL, input sanitation, password hashing, and encryption in
-a java environment with a bare-bones GUI.
+a java environment with a bare-bones JavaFX GUI.
 
 ## What it does
 When launched, a simple GUI displays two things: On the left is a login screen, and on the right is an
@@ -67,4 +67,18 @@ The methods used in the "custom" method are not exclusive, and could be combined
 method for added security in future implementations.
 
 ### Encryption:
-Coming soon
+Encryption is performed with the AES-256 algorithm. Encryption keys are stored in a KeyStore in 
+"passwords.jks" and read at launch. If no "passwords.jks" file exists, then a new key is generated at 
+program launch and a "passwords.jks" file is created to store the key. 
+
+The key for encryption and decryption must be the same. If the key the database is encrypted with is lost,
+the database cannot be decrypted. In other words, **if "passwords.jks" is somehow inaccessible after 
+"database.db" has been created (i.e. deleted or moved), then the program will be unable to run properly.**
+The only solution is to delete both "passwords.jks" and "database.db" so keys are synchronised again upon
+next program launch.
+
+The "encrypted" table in the database.db file holds the encrypted data values seen on the right, with 
+every entry containing an INT "key" value and a TEXT "data" value. Initially, this table only contains 
+one row, with a key value of "1" and data value of "hello" (after being encrypted with AES-256).
+
+Additional rows can be added/removed from the table through the GUI once logged in.
