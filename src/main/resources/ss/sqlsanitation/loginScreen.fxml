@@ -43,18 +43,18 @@
             <Label text="Edit Database:" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label text="Key" />
+                  <Label minWidth="20.0" text="Key" />
                   <TextField fx:id="addEntryKeyField" prefHeight="25.0" prefWidth="28.0" />
-                  <Label text="Data" />
+                  <Label minWidth="25.0" text="Data" />
                   <TextField fx:id="addEntryDataField" prefHeight="25.0" prefWidth="74.0" />
-                  <Button mnemonicParsing="false" onAction="#onAddData" prefHeight="25.0" prefWidth="64.0" text="Add" textAlignment="CENTER" />
+                  <Button minHeight="25.0" minWidth="64.0" mnemonicParsing="false" onAction="#onAddData" prefHeight="25.0" prefWidth="64.0" text="Add" textAlignment="CENTER" />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label text="Key" />
+                  <Label minWidth="20.0" text="Key" HBox.hgrow="NEVER" />
                   <TextField fx:id="removeEntryKeyField" prefHeight="25.0" prefWidth="124.0" />
-                  <Button mnemonicParsing="false" onAction="#OnRemoveData" prefWidth="64.0" text="Remove" />
+                  <Button minHeight="25.0" minWidth="64.0" mnemonicParsing="false" onAction="#OnRemoveData" prefHeight="25.0" prefWidth="64.0" text="Remove" />
                </children>
             </HBox>
          </children>

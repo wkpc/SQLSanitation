@@ -133,7 +133,7 @@ public final class Database
             //send a query to database to check for matches with username and password
             String command = "SELECT * FROM " + table +
                     " WHERE user = '" + username + "' AND password = '" +
-                    password + "';";
+                    password + "' LIMIT 1;";
 
             ResultSet rs = stmt.executeQuery(command);
 
@@ -165,7 +165,7 @@ public final class Database
         {
             //send a query to database to check for matches with username and password
             PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM " + table +
-                    " WHERE user = ? AND password = ?;");
+                    " WHERE user = ? AND password = ? LIMIT 1;");
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             ResultSet rs = pstmt.executeQuery();
@@ -208,7 +208,7 @@ public final class Database
             //send a query to database to check for matches with username and password
             String command = "SELECT * FROM " + table +
                     " WHERE (user = '" + username + "') AND (password = '" +
-                    password + "');";
+                    password + "') LIMIT 1;";
 
             ResultSet rs = stmt.executeQuery(command);
 
