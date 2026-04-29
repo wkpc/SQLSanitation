@@ -16,7 +16,20 @@ displays the contents of the database, in AES-256 encryption. After signing in, 
 "Decrypt Data" button to view the decrypted version instead.
 
 ## How to run it
-Coming soon
+To be able to run this game, download the "out" folder and unzip it. Make sure to keep all the contents of the folder
+together in the same directory. The other folders in the repository are not necessary to run the game. This program uses
+the external JavaFX library. This is included in the "out" folder as "javafx-sdk-25.0.1", if you already have JavaFx
+installed on your computer, you can choose to skip this file. Note: it is not normally possible to download specific files from
+GitHub without extra workarounds, so you may have to download the entire project files to get the out folder.
+
+To launch the game, simply launch the "sqlSanitation.bat" file, by either double-clicking the file or opening Command
+Prompt and typing in the file path.
+
+If you already had JavaFx installed on your computer and chose not to download the "javafx-sdk-25.0.1" file, you must
+first open "sqlSanitation.bat" in a text editor of your choice, and replace ".\javafx-sdk-25.0.1\lib" with the file URL of
+the "lib" folder inside the JavaFX files on your computer. This program was designed with version 25.0.1 of JavaFX and
+may NOT work correctly with different versions.
+
 
 ## How it works
 ### database.db:
